@@ -1,1 +1,7 @@
 .venv/
+
+outputs/
+
+bert-base-uncased/
+
+models/
