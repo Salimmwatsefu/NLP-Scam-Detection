@@ -11,9 +11,9 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 import joblib
 import os
-import requests
+import gdown
 import tarfile
-import shutil
+import magic
 
 # Initialize spaCy and NLTK
 nlp = spacy.load("en_core_web_sm")
@@ -27,15 +27,19 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 @st.cache_resource
 def download_models():
     try:
-        # Google Drive direct download link
-        GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=1NxJCsmQesMVbDxmHfS8weuMGpFwxQGBW"  
+        # Google Drive file ID
+        GOOGLE_DRIVE_FILE_ID = "1NxJCsmQesMVbDxmHfS8weuMGpFwxQGBW"
+        GOOGLE_DRIVE_URL = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
         tar_path = os.path.join(MODEL_DIR, "models.tar.gz")
         
-        # Download
-        response = requests.get(GOOGLE_DRIVE_URL, stream=True)
-        if response.status_code == 200:
-            with open(tar_path, 'wb') as f:
-                f.write(response.content)
+        # Download using gdown
+        gdown.download(GOOGLE_DRIVE_URL, tar_path, quiet=False)
+        
+        # Verify file is a valid gzip
+        file_type = magic.from_file(tar_path)
+        if "gzip" not in file_type.lower():
+            st.error(f"Downloaded file is not a gzip archive: {file_type}. Please check the Google Drive link.")
+            raise ValueError(f"Invalid file type: {file_type}")
         
         # Extract
         with tarfile.open(tar_path, 'r:gz') as tar:
@@ -44,7 +48,7 @@ def download_models():
         # Clean up
         os.remove(tar_path)
     except Exception as e:
-        st.error(f"Error downloading models: {str(e)}")
+        st.error(f"Error downloading models: {str(e)}. Contact the app owner to verify the Google Drive link.")
         raise
 
 # Load models and vectorizer
@@ -84,7 +88,18 @@ def preprocess_text(text):
     text = re.sub(r'\b[A-Z0-9]{10}\b|\bconfirmed\b|\bcompleted\b', '', text, flags=re.IGNORECASE)
     text = re.sub(r'[^\w\s]', ' ', text)
 
-    
+    doc = nlp(text)
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            text = text.replace(ent.text, '')
+
+    text = re.sub(r'\s+', ' ', text.strip())
+
+    doc = nlp(text)
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            text = text.replace(ent.text, '')
+
     doc = nlp(text)
     tokens = [token.lemma_ for token in doc if not token.is_stop and token.is_alpha and len(token.text) > 2]
     cleaned_text = " ".join(tokens)
@@ -149,7 +164,13 @@ if st.button("Analyze Text"):
                 st.write(f"**Model**: {model_choice}")
                 st.write(f"**Prediction**: {prediction}")
                 st.write(f"**Confidence**: {confidence:.2%}")
-                
+                st.subheader("Preprocessing Output")
+                st.write(f"**Tokens**: {tokens[:50]}{'...' if len(tokens) > 50 else ''}")
+                st.write(f"**Cleaned Text**: {cleaned_text[:200]}{'...' if len(cleaned_text) > 200 else ''}")
+                st.subheader("Extracted Features")
+                st.write(f"- Capitalized Words: {features['capitalized_count']}")
+                st.write(f"- Phone Numbers: {features['phone_numbers']}")
+                st.write(f"- Kiswahili/Sheng Detected: {features['is_kiswahili_sheng']}")
     else:
         st.warning("Please enter some text.")
 
