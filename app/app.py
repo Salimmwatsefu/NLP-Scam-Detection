@@ -17,7 +17,11 @@ import magic
 
 # Initialize spaCy and NLTK
 nlp = spacy.load("en_core_web_sm")
-nltk.download('punkt')
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab')
+    st.rerun()
 
 # Define model directory
 MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', 'models')
