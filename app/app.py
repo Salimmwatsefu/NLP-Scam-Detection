@@ -89,18 +89,6 @@ def preprocess_text(text):
     text = re.sub(r'[^\w\s]', ' ', text)
 
     doc = nlp(text)
-    for ent in doc.ents:
-        if ent.label_ == "PERSON":
-            text = text.replace(ent.text, '')
-
-    text = re.sub(r'\s+', ' ', text.strip())
-
-    doc = nlp(text)
-    for ent in doc.ents:
-        if ent.label_ == "PERSON":
-            text = text.replace(ent.text, '')
-
-    doc = nlp(text)
     tokens = [token.lemma_ for token in doc if not token.is_stop and token.is_alpha and len(token.text) > 2]
     cleaned_text = " ".join(tokens)
     return tokens, cleaned_text
@@ -164,13 +152,7 @@ if st.button("Analyze Text"):
                 st.write(f"**Model**: {model_choice}")
                 st.write(f"**Prediction**: {prediction}")
                 st.write(f"**Confidence**: {confidence:.2%}")
-                st.subheader("Preprocessing Output")
-                st.write(f"**Tokens**: {tokens[:50]}{'...' if len(tokens) > 50 else ''}")
-                st.write(f"**Cleaned Text**: {cleaned_text[:200]}{'...' if len(cleaned_text) > 200 else ''}")
-                st.subheader("Extracted Features")
-                st.write(f"- Capitalized Words: {features['capitalized_count']}")
-                st.write(f"- Phone Numbers: {features['phone_numbers']}")
-                st.write(f"- Kiswahili/Sheng Detected: {features['is_kiswahili_sheng']}")
+                
     else:
         st.warning("Please enter some text.")
 
