@@ -458,28 +458,27 @@ with tab1:
                     elif prediction == "Error in prediction":
                         st.error("❌ Something went wrong. Please try again.")
                     else:
-                        # Results in a modern card
+                        # Results section
                         st.markdown("### Analysis Results")
                         
-                        # Risk level with modern badge
+                        # Risk level badge
                         risk_color = {
                             "High-risk": "risk-high",
                             "Moderate-risk": "risk-moderate",
                             "Low-risk": "risk-low"
                         }[prediction]
                         
+                        # Display results without any background containers
                         st.markdown(f"""
-                            <div style='background: white; padding: 1.5rem; border-radius: 1rem; margin: 1rem 0;'>
-                                <div class='risk-badge {risk_color}'>
-                                    {prediction} • {confidence:.1%} Confidence
-                                </div>
-                                <div style='margin-top: 1rem;'>
-                                    {get_prediction_explanation(prediction, confidence, indicators)}
-                                </div>
+                            <div class='risk-badge {risk_color}'>
+                                {prediction} • {confidence:.1%} Confidence
+                            </div>
+                            <div style='margin-top: 1rem;'>
+                                {get_prediction_explanation(prediction, confidence, indicators)}
                             </div>
                         """, unsafe_allow_html=True)
                         
-                        # Indicators in modern cards
+                        # Indicators
                         if indicators:
                             st.markdown("#### 🔍 Detected Patterns")
                             for indicator in indicators:
@@ -495,7 +494,7 @@ with tab1:
                                             <span style='font-size: 1.2rem;'>{indicator['icon']}</span>
                                             <strong>{indicator['type']}</strong>
                                         </div>
-                                        <p style='margin: 0.5rem 0 0 0; color: #4B5563;'>
+                                        <p style='margin: 0.5rem 0 0 0;'>
                                             {indicator['detail']}
                                         </p>
                                     </div>
