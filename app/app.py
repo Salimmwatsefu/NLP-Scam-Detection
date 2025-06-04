@@ -12,6 +12,7 @@ import os
 import shap
 from scipy.sparse import hstack
 import logging
+from pathlib import Path
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,13 +25,21 @@ try:
 except LookupError:
     nltk.download('punkt_tab')
 
-# Define directories with absolute paths
-WORKSPACE_ROOT = '/home/sjet/iwazolab/NLP-Scam-Detection'
+# Define directories with deployment-friendly paths
+WORKSPACE_ROOT = Path(__file__).parent.parent
 MODEL_DIR = os.path.join(WORKSPACE_ROOT, 'outputs', 'models')
 DATA_DIR = os.path.join(WORKSPACE_ROOT, 'data')
 FEEDBACK_DIR = os.path.join(WORKSPACE_ROOT, 'feedback')
 TFIDF_DIR = os.path.join(DATA_DIR, 'features', 'tfidf')
-os.makedirs(FEEDBACK_DIR, exist_ok=True)
+
+# Create directories if they don't exist
+for directory in [MODEL_DIR, DATA_DIR, FEEDBACK_DIR, TFIDF_DIR]:
+    os.makedirs(directory, exist_ok=True)
+
+# Model file names (you can also use environment variables for these)
+LR_MODEL_FILE = 'logistic_scam_run_2025-05-25_01-47.pkl'
+XGB_MODEL_FILE = 'xgboost_scam_run_2025-05-25_01-47.pkl'
+TFIDF_FILE = 'tfidf_vectorizer_scam_run_2025-05-25_01-47.pkl'
 
 # Set page config as the first Streamlit command
 st.set_page_config(
