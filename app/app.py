@@ -52,63 +52,13 @@ st.set_page_config(
 # Custom CSS for modern UI
 st.markdown("""
 <style>
-    /* Modern color scheme */
-    :root {
-        --primary-color: #7C3AED;
-        --secondary-color: #4F46E5;
-        --success-color: #059669;
-        --warning-color: #D97706;
-        --danger-color: #DC2626;
-        --background-color: #F3F4F6;
-        --text-color: #1F2937;
-        --text-light: #6B7280;
-        --card-background: #FFFFFF;
-        --card-border: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Dark mode adjustments */
-    [data-theme="dark"] {
-        --background-color: #111827;
-        --text-color: #F3F4F6;
-        --text-light: #9CA3AF;
-        --card-background: #1F2937;
-        --card-border: rgba(255, 255, 255, 0.15);
-    }
-
-    /* Force dark mode compatibility */
-    .main {
-        background-color: var(--background-color) !important;
-        color: var(--text-color) !important;
-        padding: 2rem;
-    }
-
-    /* Card-like containers */
-    .stTextInput, .stTextArea, div[data-testid="stForm"] {
-        background-color: var(--card-background) !important;
-        padding: 1.5rem;
-        border-radius: 1rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-    }
-
-    /* Results container */
-    div[data-testid="stMarkdown"] > div {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 1rem;
-        padding: 1rem;
-    }
-
     /* Modern button styling */
     .stButton > button {
         width: 100%;
         padding: 0.75rem 1.5rem;
         border-radius: 0.75rem;
-        border: none;
-        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-        color: #FFFFFF !important;
+        background: linear-gradient(90deg, #7C3AED, #4F46E5);
+        color: white;
         font-weight: 600;
         transition: all 0.3s ease;
     }
@@ -116,7 +66,7 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
     }
-
+    
     /* Risk level badges */
     .risk-badge {
         padding: 0.5rem 1rem;
@@ -137,17 +87,14 @@ st.markdown("""
         background-color: rgba(16, 185, 129, 0.2);
         color: #10B981;
     }
-
+    
     /* Indicator cards */
     .indicator-card {
-        background-color: var(--card-background) !important;
         padding: 1rem;
         border-radius: 0.75rem;
         margin: 0.5rem 0;
         border-left: 4px solid;
         transition: transform 0.2s ease;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
     }
     .indicator-card:hover {
         transform: translateX(5px);
@@ -158,151 +105,21 @@ st.markdown("""
     .indicator-medium {
         border-left-color: #F59E0B;
     }
-    .remotector-low {
+    .indicator-low {
         border-left-color: #10B981;
     }
-
-    /* Headers and text */
+    
+    /* Headers */
     h1, h2, h3, h4, h5, h6 {
-        color: var(--text-color) !important;
         font-weight: 700;
     }
-    .subtitle {
-        color: var(--text-light) !important;
-        font-size: 1.1rem;
-    }
-
-    /* Tabs styling */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 2rem;
-        background-color: var(--card-background) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-    .stTabs [data-baseweb="tab"] {
-        padding: 1rem 2rem;
-        border-radius: 0.5rem;
-        color: var(--text-color) !important;
-        background-color: var(--card-background) !important;
-    }
-    .stTabs [data-baseweb="tab-highlight"] {
-        background-color: var(--primary-color) !important;
-    }
-
-    /* Safety guide cards */
-    .safety-card {
-        background-color: var(--card-background) !important;
-        padding: 1.5rem;
-        border-radius: 1rem;
-        margin-bottom: 1.5rem;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-    }
-
+    
     /* Protection tips */
     .protection-tip {
         padding: 1rem;
         border-radius: 0.5rem;
-        background-color: var(--card-background) !important;
-        border-left: 4px solid var(--primary-color);
+        border-left: 4px solid #7C3AED;
         margin: 0.5rem 0;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-    }
-
-    /* Links */
-    a {
-        color: var(--primary-color) !important;
-        text-decoration: none;
-    }
-    a:hover {
-        text-decoration: underline;
-    }
-
-    /* Form elements */
-    .stSelectbox [data-baseweb="select"] {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-
-    /* File uploader */
-    .stFileUploader, .stUploadedFile {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-
-    /* Expander */
-    .streamlit-expanderHeader {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-
-    /* Dataframe */
-    .stDataFrame {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-    .stDataFrame [data-testid="stDataFrameCell"] {
-        color: var(--text-color) !important;
-        background-color: var(--card-background) !important;
-    }
-    .stDataFrame [data-testid="stDataFrameHeaderCell"] {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-    }
-
-    /* Text inputs */
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-
-    /* Radio buttons */
-    div.row-widget.stRadio > div {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-        border: 1px solid var(--card-border) !important;
-        border-radius: 0.5rem;
-    }
-    div.row-widget.stRadio > div > label {
-        color: var(--text-color) !important;
-    }
-
-    /* Markdown containers */
-    div.stMarkdown {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-    }
-
-    /* Override Streamlit defaults for dark mode */
-    [data-testid="stAppViewContainer"] {
-        background-color: var(--background-color) !important;
-    }
-    [data-testid="stSidebar"] {
-        background-color: var(--card-background) !important;
-        color: var(--text-color) !important;
-    }
-    [data-testid="stVerticalBlock"] {
-        background-color: var(--background-color) !important;
-    }
-
-    /* Ensure no white backgrounds in any elements */
-    div, section, article, aside {
-        background-color: transparent !important;
-    }
-    *[style*="background: white"], *[style*="background-color: white"] {
-        background-color: var(--card-background) !important;
     }
 </style>
 """, unsafe_allow_html=True)
