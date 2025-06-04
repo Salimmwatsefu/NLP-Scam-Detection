@@ -60,20 +60,33 @@ st.markdown("""
         --warning-color: #D97706;
         --danger-color: #DC2626;
         --background-color: #F3F4F6;
+        --text-color: #1F2937;
+        --text-light: #6B7280;
+        --card-background: #FFFFFF;
+    }
+
+    /* Dark mode adjustments */
+    [data-theme="dark"] {
+        --background-color: #1F2937;
+        --text-color: #F3F4F6;
+        --text-light: #9CA3AF;
+        --card-background: #374151;
     }
     
     /* Main container styling */
     .main {
         background-color: var(--background-color);
         padding: 2rem;
+        color: var(--text-color);
     }
     
     /* Card-like containers */
     .stTextInput, .stTextArea, div[data-testid="stForm"] {
-        background-color: white;
+        background-color: var(--card-background) !important;
         padding: 1.5rem;
         border-radius: 1rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        color: var(--text-color) !important;
     }
     
     /* Modern button styling */
@@ -83,7 +96,7 @@ st.markdown("""
         border-radius: 0.75rem;
         border: none;
         background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-        color: white;
+        color: white !important;
         font-weight: 600;
         transition: all 0.3s ease;
     }
@@ -101,60 +114,117 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     .risk-high {
-        background-color: #FEE2E2;
-        color: var(--danger-color);
+        background-color: rgba(220, 38, 38, 0.1);
+        color: #EF4444;
     }
     .risk-moderate {
-        background-color: #FEF3C7;
-        color: var(--warning-color);
+        background-color: rgba(217, 119, 6, 0.1);
+        color: #F59E0B;
     }
     .risk-low {
-        background-color: #D1FAE5;
-        color: var(--success-color);
+        background-color: rgba(5, 150, 105, 0.1);
+        color: #10B981;
     }
     
     /* Indicator cards */
     .indicator-card {
-        background: white;
+        background-color: var(--card-background);
         padding: 1rem;
         border-radius: 0.75rem;
         margin: 0.5rem 0;
         border-left: 4px solid;
         transition: transform 0.2s ease;
+        color: var(--text-color);
     }
     .indicator-card:hover {
         transform: translateX(5px);
     }
     .indicator-high {
-        border-left-color: var(--danger-color);
+        border-left-color: #EF4444;
     }
     .indicator-medium {
-        border-left-color: var(--warning-color);
+        border-left-color: #F59E0B;
     }
     .indicator-low {
-        border-left-color: var(--success-color);
+        border-left-color: #10B981;
     }
     
     /* Headers and text */
     h1, h2, h3 {
-        color: #1F2937;
+        color: var(--text-color) !important;
         font-weight: 700;
     }
     .subtitle {
-        color: #6B7280;
+        color: var(--text-light);
         font-size: 1.1rem;
     }
     
     /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 2rem;
+        background-color: transparent !important;
     }
     .stTabs [data-baseweb="tab"] {
         padding: 1rem 2rem;
         border-radius: 0.5rem 0.5rem 0 0;
+        color: var(--text-color) !important;
     }
     .stTabs [data-baseweb="tab-highlight"] {
         background-color: var(--primary-color);
+    }
+
+    /* Safety guide cards */
+    .safety-card {
+        background-color: var(--card-background);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+    }
+    
+    /* Protection tips */
+    .protection-tip {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background-color: var(--card-background);
+        border-left: 4px solid var(--primary-color);
+        margin: 0.5rem 0;
+        color: var(--text-color);
+    }
+    
+    /* Links */
+    a {
+        color: var(--primary-color) !important;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Form elements */
+    .stSelectbox [data-baseweb="select"] {
+        background-color: var(--card-background);
+        color: var(--text-color);
+    }
+    
+    /* File uploader */
+    .stUploadedFile {
+        background-color: var(--card-background) !important;
+        color: var(--text-color) !important;
+    }
+    
+    /* Expander */
+    .streamlit-expanderHeader {
+        color: var(--text-color) !important;
+        background-color: var(--card-background) !important;
+    }
+    
+    /* Dataframe */
+    .stDataFrame {
+        background-color: var(--card-background) !important;
+    }
+    .stDataFrame [data-testid="stDataFrameCell"] {
+        color: var(--text-color) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -600,30 +670,29 @@ with tab1:
                     st.error(f"Error processing CSV: {str(e)}")
 
 with tab2:
-    # Modern safety guide with cards
     st.markdown("""
         <div style='max-width: 800px; margin: 0 auto;'>
             <h2 style='text-align: center; margin-bottom: 2rem;'>🛡️ Your Guide to SMS Safety</h2>
             
-            <div style='background: white; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;'>
+            <div class='safety-card'>
                 <h3>🎯 Common Scam Tactics</h3>
                 <div style='display: grid; gap: 1rem; margin-top: 1rem;'>
-                    <div style='padding: 1rem; border-left: 4px solid #DC2626; background: #FEF2F2; border-radius: 0.5rem;'>
+                    <div class='protection-tip'>
                         <strong>⚡ Urgency Pressure</strong>
                         <p style='margin: 0.5rem 0 0 0;'>Scammers create false urgency to make you act without thinking</p>
                     </div>
-                    <div style='padding: 1rem; border-left: 4px solid #D97706; background: #FEF3C7; border-radius: 0.5rem;'>
+                    <div class='protection-tip'>
                         <strong>💰 Financial Lures</strong>
                         <p style='margin: 0.5rem 0 0 0;'>Be cautious of unexpected money-related messages or too-good-to-be-true offers</p>
                     </div>
-                    <div style='padding: 1rem; border-left: 4px solid #059669; background: #D1FAE5; border-radius: 0.5rem;'>
+                    <div class='protection-tip'>
                         <strong>🔒 Personal Information</strong>
                         <p style='margin: 0.5rem 0 0 0;'>Legitimate services never ask for PINs or passwords via SMS</p>
                     </div>
                 </div>
             </div>
             
-            <div style='background: white; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;'>
+            <div class='safety-card'>
                 <h3>🛡️ Protection Tips</h3>
                 <div style='display: grid; gap: 1rem; margin-top: 1rem;'>
                     <div class='protection-tip'>
@@ -645,9 +714,9 @@ with tab2:
                 </div>
             </div>
             
-            <div style='background: white; padding: 2rem; border-radius: 1rem;'>
+            <div class='safety-card'>
                 <h3>📢 Report Scams</h3>
-                <p style='color: #6B7280; margin-bottom: 1rem;'>Help protect others by reporting scam messages to:</p>
+                <p style='color: var(--text-light); margin-bottom: 1rem;'>Help protect others by reporting scam messages to:</p>
                 <ul style='list-style-type: none; padding: 0;'>
                     <li style='margin: 0.5rem 0;'>📱 Your mobile service provider</li>
                     <li style='margin: 0.5rem 0;'>🏛️ Communications Authority of Kenya</li>
