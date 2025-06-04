@@ -564,61 +564,64 @@ with tab1:
                     st.error(f"Error processing CSV: {str(e)}")
 
 with tab2:
+    st.markdown("## 🛡️ Your Guide to SMS Safety")
+    
+    # Common Scam Tactics
+    st.markdown("### 🎯 Common Scam Tactics")
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+            #### ⚡ Urgency Pressure
+            Scammers create false urgency to make you act without thinking
+        """)
+    
+    with col2:
+        st.markdown("""
+            #### 💰 Financial Lures
+            Be cautious of unexpected money-related messages or too-good-to-be-true offers
+        """)
+    
+    with col3:
+        st.markdown("""
+            #### 🔒 Personal Information
+            Legitimate services never ask for PINs or passwords via SMS
+        """)
+    
+    # Protection Tips
+    st.markdown("### 🛡️ Protection Tips")
+    tips_col1, tips_col2 = st.columns(2)
+    
+    with tips_col1:
+        st.markdown("""
+            #### 1. Take Your Time ⏳
+            - Legitimate messages don't require immediate action
+            - Think before you click or respond
+            
+            #### 2. Verify Independently ✅
+            - Contact companies through their official channels
+            - Don't use numbers or links from suspicious messages
+        """)
+    
+    with tips_col2:
+        st.markdown("""
+            #### 3. Guard Your Information 🔐
+            - Never share PINs, passwords, or personal details
+            - Be cautious with any requests for sensitive data
+            
+            #### 4. Check URLs Carefully 🔍
+            - Look for misspellings in web addresses
+            - Verify the sender's identity before clicking links
+        """)
+    
+    # Report Scams
+    st.markdown("### 📢 Report Scams")
     st.markdown("""
-        <div style='max-width: 800px; margin: 0 auto;'>
-            <h2 style='text-align: center; margin-bottom: 2rem;'>🛡️ Your Guide to SMS Safety</h2>
-            
-            <div class='safety-card'>
-                <h3>🎯 Common Scam Tactics</h3>
-                <div style='display: grid; gap: 1rem; margin-top: 1rem;'>
-                    <div class='protection-tip'>
-                        <strong>⚡ Urgency Pressure</strong>
-                        <p style='margin: 0.5rem 0 0 0;'>Scammers create false urgency to make you act without thinking</p>
-                    </div>
-                    <div class='protection-tip'>
-                        <strong>💰 Financial Lures</strong>
-                        <p style='margin: 0.5rem 0 0 0;'>Be cautious of unexpected money-related messages or too-good-to-be-true offers</p>
-                    </div>
-                    <div class='protection-tip'>
-                        <strong>🔒 Personal Information</strong>
-                        <p style='margin: 0.5rem 0 0 0;'>Legitimate services never ask for PINs or passwords via SMS</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class='safety-card'>
-                <h3>🛡️ Protection Tips</h3>
-                <div style='display: grid; gap: 1rem; margin-top: 1rem;'>
-                    <div class='protection-tip'>
-                        <strong>1. Take Your Time ⏳</strong>
-                        <p>Legitimate messages don't require immediate action</p>
-                    </div>
-                    <div class='protection-tip'>
-                        <strong>2. Verify Independently ✅</strong>
-                        <p>Contact companies through their official channels</p>
-                    </div>
-                    <div class='protection-tip'>
-                        <strong>3. Guard Your Information 🔐</strong>
-                        <p>Never share sensitive details through SMS</p>
-                    </div>
-                    <div class='protection-tip'>
-                        <strong>4. Check URLs Carefully 🔍</strong>
-                        <p>Watch for slight misspellings in web addresses</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class='safety-card'>
-                <h3>📢 Report Scams</h3>
-                <p style='color: var(--text-light); margin-bottom: 1rem;'>Help protect others by reporting scam messages to:</p>
-                <ul style='list-style-type: none; padding: 0;'>
-                    <li style='margin: 0.5rem 0;'>📱 Your mobile service provider</li>
-                    <li style='margin: 0.5rem 0;'>🏛️ Communications Authority of Kenya</li>
-                    <li style='margin: 0.5rem 0;'>👮 Local cyber crime units</li>
-                </ul>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+        Help protect others by reporting scam messages to:
+        - 📱 Your mobile service provider
+        - 🏛️ Communications Authority of Kenya
+        - 👮 Local cyber crime units
+    """)
 
 # Modern footer
 st.markdown("""
