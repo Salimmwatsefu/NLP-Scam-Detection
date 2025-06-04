@@ -63,14 +63,16 @@ st.markdown("""
         --text-color: #1F2937;
         --text-light: #6B7280;
         --card-background: #FFFFFF;
+        --card-border: rgba(255, 255, 255, 0.1);
     }
 
     /* Dark mode adjustments */
     [data-theme="dark"] {
-        --background-color: #1F2937;
+        --background-color: #111827;
         --text-color: #F3F4F6;
         --text-light: #9CA3AF;
-        --card-background: #374151;
+        --card-background: #1F2937;
+        --card-border: rgba(255, 255, 255, 0.1);
     }
     
     /* Main container styling */
@@ -87,6 +89,13 @@ st.markdown("""
         border-radius: 1rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         color: var(--text-color) !important;
+        border: 1px solid var(--card-border);
+    }
+
+    /* Results container */
+    div[data-testid="stMarkdown"] > div {
+        background-color: var(--card-background) !important;
+        border: 1px solid var(--card-border);
     }
     
     /* Modern button styling */
@@ -114,15 +123,15 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     .risk-high {
-        background-color: rgba(220, 38, 38, 0.1);
+        background-color: rgba(239, 68, 68, 0.2);
         color: #EF4444;
     }
     .risk-moderate {
-        background-color: rgba(217, 119, 6, 0.1);
+        background-color: rgba(245, 158, 11, 0.2);
         color: #F59E0B;
     }
     .risk-low {
-        background-color: rgba(5, 150, 105, 0.1);
+        background-color: rgba(16, 185, 129, 0.2);
         color: #10B981;
     }
     
@@ -135,6 +144,7 @@ st.markdown("""
         border-left: 4px solid;
         transition: transform 0.2s ease;
         color: var(--text-color);
+        border: 1px solid var(--card-border);
     }
     .indicator-card:hover {
         transform: translateX(5px);
@@ -180,6 +190,7 @@ st.markdown("""
         border-radius: 1rem;
         margin-bottom: 1.5rem;
         color: var(--text-color);
+        border: 1px solid var(--card-border);
     }
     
     /* Protection tips */
@@ -190,6 +201,7 @@ st.markdown("""
         border-left: 4px solid var(--primary-color);
         margin: 0.5rem 0;
         color: var(--text-color);
+        border: 1px solid var(--card-border);
     }
     
     /* Links */
@@ -203,27 +215,54 @@ st.markdown("""
     
     /* Form elements */
     .stSelectbox [data-baseweb="select"] {
-        background-color: var(--card-background);
-        color: var(--text-color);
+        background-color: var(--card-background) !important;
+        color: var(--text-color) !important;
+        border: 1px solid var(--card-border) !important;
     }
     
     /* File uploader */
     .stUploadedFile {
         background-color: var(--card-background) !important;
         color: var(--text-color) !important;
+        border: 1px solid var(--card-border) !important;
     }
     
     /* Expander */
     .streamlit-expanderHeader {
         color: var(--text-color) !important;
         background-color: var(--card-background) !important;
+        border: 1px solid var(--card-border) !important;
     }
     
     /* Dataframe */
     .stDataFrame {
         background-color: var(--card-background) !important;
+        border: 1px solid var(--card-border) !important;
     }
     .stDataFrame [data-testid="stDataFrameCell"] {
+        color: var(--text-color) !important;
+    }
+
+    /* Override any white backgrounds */
+    div.stMarkdown {
+        color: var(--text-color) !important;
+    }
+    
+    div.row-widget.stRadio > div {
+        background-color: var(--card-background) !important;
+        color: var(--text-color) !important;
+    }
+
+    /* Make sure text inputs have proper background */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
+        background-color: var(--card-background) !important;
+        color: var(--text-color) !important;
+    }
+
+    /* Ensure select boxes have proper colors */
+    .stSelectbox > div > div > div {
+        background-color: var(--card-background) !important;
         color: var(--text-color) !important;
     }
 </style>
