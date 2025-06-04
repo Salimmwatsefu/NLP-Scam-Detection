@@ -469,7 +469,7 @@ with tab1:
                         }[prediction]
                         
                         st.markdown(f"""
-                            <div style='background: white; padding: 1.5rem; border-radius: 1rem; margin: 1rem 0;'>
+                            <div style='padding: 1.5rem; border-radius: 1rem;'>
                                 <div class='risk-badge {risk_color}'>
                                     {prediction} • {confidence:.1%} Confidence
                                 </div>
@@ -495,7 +495,7 @@ with tab1:
                                             <span style='font-size: 1.2rem;'>{indicator['icon']}</span>
                                             <strong>{indicator['type']}</strong>
                                         </div>
-                                        <p style='margin: 0.5rem 0 0 0; color: #4B5563;'>
+                                        <p style='margin: 0.5rem 0 0 0;'>
                                             {indicator['detail']}
                                         </p>
                                     </div>
