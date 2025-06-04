@@ -1,9 +1,6 @@
 .venv/
 
-outputs/
 
-bert-base-uncased/
 
-models/
 
-models.tar.gz
+
