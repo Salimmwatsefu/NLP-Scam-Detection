@@ -1,0 +1,21 @@
+feature,shap_value,trigger
+stop,0.58907115,urgency
+is_kiswahili_sheng,0.46235272,language
+today,0.32722938,urgency
+account,0.15543124,greed
+dear,0.1469438,social_proof
+reply,0.14650203,
+message,0.09904139,
+balance,0.097576216,greed
+mpesa,0.080766365,scam_specific
+whatsapp,0.06878182,scam_specific
+ksh,0.06391739,
+madam,0.059983518,
+play,0.059551574,greed
+container,0.05568344,
+click,0.050121967,scam_specific
+pesa,0.046248935,
+app,0.043132756,
+password,0.03960809,
+dear tenant,0.038039718,
+pin,0.036871415,

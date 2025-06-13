@@ -13,6 +13,9 @@ import shap
 from scipy.sparse import hstack
 import logging
 from pathlib import Path
+import sys
+from datetime import datetime
+import json
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -25,16 +28,30 @@ try:
 except LookupError:
     nltk.download('punkt_tab')
 
-# Define directories with deployment-friendly paths
-WORKSPACE_ROOT = Path(__file__).parent.parent
+# Define directories
+WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_DIR = os.path.join(WORKSPACE_ROOT, 'outputs', 'models')
 DATA_DIR = os.path.join(WORKSPACE_ROOT, 'data')
-FEEDBACK_DIR = os.path.join(WORKSPACE_ROOT, 'feedback')
-TFIDF_DIR = os.path.join(DATA_DIR, 'features', 'tfidf')
+FEEDBACK_DIR = os.path.join(DATA_DIR, 'feedback')
+TFIDF_DIR = os.path.join(WORKSPACE_ROOT, 'outputs', 'tfidf')
 
-# Create directories if they don't exist
+# Create necessary directories
 for directory in [MODEL_DIR, DATA_DIR, FEEDBACK_DIR, TFIDF_DIR]:
-    os.makedirs(directory, exist_ok=True)
+    try:
+        os.makedirs(directory, exist_ok=True)
+        logger.info(f"Created/verified directory: {directory}")
+    except Exception as e:
+        logger.error(f"Error creating directory {directory}: {str(e)}")
+
+# Verify feedback directory exists and is writable
+try:
+    feedback_test_file = os.path.join(FEEDBACK_DIR, 'test.txt')
+    with open(feedback_test_file, 'w') as f:
+        f.write('test')
+    os.remove(feedback_test_file)
+    logger.info(f"Feedback directory {FEEDBACK_DIR} is writable")
+except Exception as e:
+    logger.error(f"Error writing to feedback directory: {str(e)}")
 
 # Model file names (you can also use environment variables for these)
 LR_MODEL_FILE = 'logistic_scam_run_2025-05-25_01-47.pkl'
@@ -363,19 +380,34 @@ def predict(text, selected_model):
 
 # Save user feedback
 def save_feedback(text, prediction, user_correction, selected_model):
-    feedback_data = {
-        'timestamp': pd.Timestamp.now(),
-        'input_text': text,
-        'prediction': prediction,
-        'user_correction': user_correction,
-        'model_used': selected_model
-    }
-    feedback_df = pd.DataFrame([feedback_data])
-    feedback_path = os.path.join(FEEDBACK_DIR, 'user_feedback.csv')
-    if os.path.exists(feedback_path):
-        feedback_df.to_csv(feedback_path, mode='a', header=False, index=False)
-    else:
-        feedback_df.to_csv(feedback_path, index=False)
+    try:
+        # Create a simple feedback record
+        feedback_data = {
+            'timestamp': pd.Timestamp.now(),
+            'message': text,
+            'original_prediction': prediction,
+            'correct_label': user_correction,
+            'model_type': selected_model
+        }
+        
+        # Convert to DataFrame
+        feedback_df = pd.DataFrame([feedback_data])
+        
+        # Save to CSV
+        feedback_path = os.path.join(FEEDBACK_DIR, 'user_feedback.csv')
+        
+        # If file exists, append without header, otherwise create new with header
+        if os.path.exists(feedback_path):
+            feedback_df.to_csv(feedback_path, mode='a', header=False, index=False)
+        else:
+            feedback_df.to_csv(feedback_path, index=False)
+            
+        print(f"Feedback saved successfully to {feedback_path}")  # Direct print for debugging
+        return True
+        
+    except Exception as e:
+        print(f"Error saving feedback: {str(e)}")  # Direct print for debugging
+        return False
 
 def get_prediction_explanation(prediction, confidence, indicators):
     explanation = []
@@ -502,16 +534,21 @@ with tab1:
                         
                         # Modern feedback section
                         with st.expander("📝 Help Us Improve"):
-                            with st.form(key='feedback_form'):
-                                st.markdown("##### Was this analysis accurate?")
-                                user_correction = st.radio(
-                                    "",
-                                    ["✅ Correct", "❌ Should be Low-risk", "❌ Should be Moderate-risk", "❌ Should be High-risk"]
-                                )
-                                if st.form_submit_button("Submit Feedback", use_container_width=True):
-                                    if user_correction != "✅ Correct":
-                                        save_feedback(text_input, prediction, user_correction.split("Should be ")[-1], selected_model)
+                            st.markdown("##### Was this analysis accurate?")
+                            user_correction = st.radio(
+                                "",
+                                ["✅ Correct", "❌ Should be Low-risk", "❌ Should be Moderate-risk", "❌ Should be High-risk"]
+                            )
+                            
+                            if st.button("Submit Feedback", use_container_width=True):
+                                if user_correction != "✅ Correct":
+                                    corrected_label = user_correction.split("Should be ")[-1]
+                                    if save_feedback(text_input, prediction, corrected_label, selected_model):
                                         st.success("🙏 Thank you for helping us improve!")
+                                    else:
+                                        st.error("Failed to save feedback. Please try again.")
+                                else:
+                                    st.info("Thank you for confirming the prediction was correct!")
             else:
                 st.warning("Please enter a message to analyze.")
         
@@ -630,3 +667,107 @@ st.markdown("""
         <p>For support or feedback, visit <a href='https://mursimind.com' style='color: var(--primary-color); text-decoration: none;'>Mursi Mind</a></p>
     </div>
 """, unsafe_allow_html=True)
+
+# Add src directory to path
+src_path = str(Path(__file__).parent.parent / "src")
+sys.path.append(src_path)
+
+from models.predict import predict_message
+from utils.preprocess import preprocess_text
+from utils.uncertainty import calculate_uncertainty
+from utils.feedback import save_feedback, load_feedback_data, get_feedback_stats
+
+def initialize_session_state():
+    """Initialize session state variables."""
+    if 'feedback_history' not in st.session_state:
+        st.session_state.feedback_history = []
+    if 'uncertain_messages' not in st.session_state:
+        st.session_state.uncertain_messages = []
+
+def load_uncertain_messages():
+    """Load messages that need feedback based on uncertainty."""
+    try:
+        # Load processed data
+        data_path = Path(__file__).parent.parent / "data" / "processed" / "scam_preprocessed.csv"
+        df = pd.read_csv(data_path)
+        
+        # Calculate uncertainty for each message
+        uncertainties = []
+        for _, row in df.iterrows():
+            message = row['message_content']
+            prediction, probability = predict_message(message)
+            uncertainty = calculate_uncertainty(probability)
+            uncertainties.append((message, uncertainty, prediction))
+        
+        # Sort by uncertainty and get top 10 most uncertain messages
+        uncertainties.sort(key=lambda x: x[1], reverse=True)
+        return uncertainties[:10]
+    except Exception as e:
+        logger.error(f"Error loading uncertain messages: {str(e)}")
+        return []
+
+def collect_feedback(message, prediction, probability):
+    """Collect user feedback for a message."""
+    st.write("---")
+    st.write("**Message:**")
+    st.write(message)
+    st.write(f"**Current Prediction:** {prediction} (Confidence: {probability:.2%})")
+    
+    feedback = st.radio(
+        "Is this prediction correct?",
+        ["Yes", "No"],
+        key=f"feedback_{hash(message)}"
+    )
+    
+    if feedback == "No":
+        correct_label = st.radio(
+            "What is the correct label?",
+            ["high_scam", "moderate_scam", "legit"],
+            key=f"label_{hash(message)}"
+        )
+    else:
+        correct_label = prediction
+    
+    if st.button("Submit Feedback", key=f"submit_{hash(message)}"):
+        try:
+            feedback_data = {
+                "message": message,
+                "original_prediction": prediction,
+                "original_probability": probability,
+                "user_feedback": feedback,
+                "correct_label": correct_label,
+                "timestamp": datetime.now().isoformat()
+            }
+            save_feedback(feedback_data)
+            st.session_state.feedback_history.append(feedback_data)
+            
+            # Show success message with details
+            st.success(f"""
+            ✅ Feedback submitted successfully!
+            
+            Details:
+            - Original Prediction: {prediction}
+            - Your Feedback: {feedback}
+            - Correct Label: {correct_label}
+            - Timestamp: {feedback_data['timestamp']}
+            """)
+            
+            # Show feedback statistics
+            stats = get_feedback_stats()
+            st.write("### Feedback Statistics")
+            st.write(f"Total feedback collected: {stats['total_feedback']}")
+            st.write("Feedback by label:")
+            for label, count in stats['feedback_by_label'].items():
+                st.write(f"- {label}: {count}")
+            
+            return True
+        except Exception as e:
+            st.error(f"""
+            ❌ Error submitting feedback: {str(e)}
+            
+            Please try again or contact support if the problem persists.
+            """)
+            logger.error(f"Error saving feedback: {str(e)}")
+            return False
+    return False
+
