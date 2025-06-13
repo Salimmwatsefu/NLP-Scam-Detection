@@ -42,7 +42,7 @@ Steps:
 Input is the cleaned_text
 
 1. Calculate Max_Length
-Compute the longest tokenized sequence across all texts using BERT’s bert-base-uncased tokenizer, capped at 200 tokens.
+Compute the longest tokenized sequence across all texts using BERT's bert-base-uncased tokenizer, capped at 200 tokens.
 Skip empty texts to avoid errors, using only valid texts (filtered with text.strip()).
 
 2. Batch Processing
@@ -80,6 +80,75 @@ Goal - Produce bert_input_ids ready for BERT embeddings, capturing scam patterns
 2. Preserves complex structures (tokens lists, bert_input_ids arrays) vs. CSV.
 
 Goal - Validate preprocessing, ensure data is model-ready, and enable quick iteration in later steps (e.g., classification).
+
+## SHAP Analysis Methodology
+
+### Overview
+SHAP (SHapley Additive exPlanations) analysis is used to understand how different features contribute to the model's predictions. This helps us identify which psychological triggers and patterns are most influential in scam detection.
+
+### Implementation Steps
+1. **Feature Importance Calculation**
+   - Use SHAP values to quantify the impact of each feature
+   - Calculate both global (overall) and local (per-instance) importance
+   - Focus on psychological trigger features
+
+2. **Trigger Taxonomy Mapping**
+   - Map features to psychological trigger categories:
+     - Greed triggers (e.g., money, win, bonus)
+     - Urgency triggers (e.g., now, today, limited)
+     - Authority triggers (e.g., official, secure, verify)
+     - Fear triggers (e.g., account, security, warning)
+     - Social proof triggers (e.g., others, people, users)
+   - Calculate aggregate impact for each trigger category
+
+3. **Analysis Approach**
+   - Compare trigger importance across different scam types
+   - Identify patterns in how triggers are used together
+   - Analyze the relationship between trigger combinations and scam risk levels
+
+## Demographic Analysis Methodology
+
+### Overview
+The demographic analysis approach aims to understand how scam patterns vary across different demographic groups and improve detection by considering demographic-specific characteristics.
+
+### Implementation Steps
+1. **Demographic Inference**
+   - Analyze message content for demographic indicators
+   - Categorize messages into demographic groups:
+     - General population
+     - Low-income individuals
+     - Youth
+   - Use linguistic patterns and content markers for classification
+
+2. **Demographic-Aware Model Training**
+   - Train separate models for each demographic group
+   - Incorporate demographic features into the model
+   - Apply demographic-specific weights to features
+   - Use both XGBoost and Logistic Regression models
+
+3. **Model Evaluation**
+   - Evaluate performance across demographic groups
+   - Calculate metrics for each message type:
+     - High-risk scams
+     - Moderate-risk scams
+     - Legitimate messages
+   - Compare model performance between demographic groups
+
+### Technical Implementation
+1. **Feature Engineering**
+   - Extract demographic indicators from text
+   - Create demographic-specific feature sets
+   - Normalize features across demographic groups
+
+2. **Model Training**
+   - Split data by demographic groups
+   - Train models with demographic weights
+   - Implement cross-validation for each group
+
+3. **Performance Metrics**
+   - Calculate accuracy, precision, recall, and F1-score
+   - Evaluate performance per demographic group
+   - Compare results across different message types
 
 
 

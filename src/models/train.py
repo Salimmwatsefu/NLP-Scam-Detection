@@ -10,10 +10,16 @@ import pickle
 import json
 from datetime import datetime
 import yaml
+import joblib
+from pathlib import Path
+from torch.utils.data import Dataset
 
 # Setup logger
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
+
+# Constants
+MODEL_DIR = Path(__file__).parent.parent.parent / "outputs" / "models"
 
 def load_config(config_path="config.yaml"):
     try:
@@ -302,6 +308,48 @@ def run_training(config):
         models["bert"] = train_bert(config)
     logger.info("✅ Training completed.")
     return models
+
+def train_model(X, y, model_type="XGBoost"):
+    """
+    Train a model on the given data.
+    
+    Args:
+        X: Training features
+        y: Training labels
+        model_type (str): Type of model to train ('XGBoost', 'Logistic Regression', or 'BERT')
+        
+    Returns:
+        The trained model
+    """
+    try:
+        if model_type == "XGBoost":
+            model = XGBClassifier(
+                n_estimators=100,
+                learning_rate=0.1,
+                max_depth=5,
+                random_state=42
+            )
+        elif model_type == "Logistic Regression":
+            model = LogisticRegression(
+                max_iter=1000,
+                random_state=42
+            )
+        else:
+            raise ValueError(f"Unsupported model type: {model_type}")
+            
+        # Train the model
+        model.fit(X, y)
+        
+        # Save the model
+        model_path = MODEL_DIR / f"{model_type.lower()}_model.joblib"
+        joblib.dump(model, model_path)
+        
+        logger.info(f"{model_type} model trained and saved successfully")
+        return model
+        
+    except Exception as e:
+        logger.error(f"Error training model: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     config = load_config()
