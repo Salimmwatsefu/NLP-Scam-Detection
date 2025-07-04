@@ -52,12 +52,11 @@ def train_logistic_regression(X_train, y_train, X_test, y_test, config):
     model = LogisticRegression(
         C=config["model"]["hyperparams"]["C"],
         max_iter=config["model"]["hyperparams"]["max_iter"],
-        multi_class="multinomial",
         random_state=42
     )
     model.fit(X_train, y_train)
     
-    classes = np.array([0, 1, 2])  # legit, moderate_scam, high_scam
+    classes = np.array([0, 1])  # legit, scam
     # Training metrics
     y_pred_train = model.predict(X_train)
     train_accuracy = accuracy_score(y_train, y_pred_train)
@@ -83,8 +82,7 @@ def train_logistic_regression(X_train, y_train, X_test, y_test, config):
             "f1_weighted": train_f1,
             "per_class": {
                 "legit": {"precision": train_per_class[0][0], "recall": train_per_class[1][0], "f1": train_per_class[2][0]},
-                "moderate_scam": {"precision": train_per_class[0][1], "recall": train_per_class[1][1], "f1": train_per_class[2][1]},
-                "high_scam": {"precision": train_per_class[0][2], "recall": train_per_class[1][2], "f1": train_per_class[2][2]}
+                "scam": {"precision": train_per_class[0][1], "recall": train_per_class[1][1], "f1": train_per_class[2][1]}
             }
         },
         "test": {
@@ -94,17 +92,15 @@ def train_logistic_regression(X_train, y_train, X_test, y_test, config):
             "f1_weighted": test_f1,
             "per_class": {
                 "legit": {"precision": test_per_class[0][0], "recall": test_per_class[1][0], "f1": test_per_class[2][0]},
-                "moderate_scam": {"precision": test_per_class[0][1], "recall": test_per_class[1][1], "f1": test_per_class[2][1]},
-                "high_scam": {"precision": test_per_class[0][2], "recall": test_per_class[1][2], "f1": test_per_class[2][2]}
+                "scam": {"precision": test_per_class[0][1], "recall": test_per_class[1][1], "f1": test_per_class[2][1]}
             }
         }
     }
     save_metrics(metrics, "logistic", config)
     
-    model_path = get_output_filename(config["model"]["save_path"], "logistic", config) + ".pkl"
+    model_path = get_output_filename(config["model"]["save_path"], "logistic_regression_model", config) + ".joblib"
     os.makedirs(config["model"]["save_path"], exist_ok=True)
-    with open(model_path, "wb") as f:
-        pickle.dump(model, f)
+    joblib.dump(model, model_path)
     logger.info(f"Logistic Regression model saved to {model_path}")
     return model
 
@@ -114,13 +110,12 @@ def train_xgboost(X_train, y_train, X_test, y_test, config):
         n_estimators=config["model"]["hyperparams"].get("n_estimators", 100),
         learning_rate=config["model"]["hyperparams"].get("learning_rate", 0.1),
         max_depth=config["model"]["hyperparams"].get("max_depth", 6),
-        objective="multi:softmax",
-        num_class=3,
+        objective="binary:logistic",
         random_state=42
     )
     model.fit(X_train, y_train)
     
-    classes = np.array([0, 1, 2])
+    classes = np.array([0, 1])  # legit, scam
     # Training metrics
     y_pred_train = model.predict(X_train)
     train_accuracy = accuracy_score(y_train, y_pred_train)
@@ -146,8 +141,7 @@ def train_xgboost(X_train, y_train, X_test, y_test, config):
             "f1_weighted": train_f1,
             "per_class": {
                 "legit": {"precision": train_per_class[0][0], "recall": train_per_class[1][0], "f1": train_per_class[2][0]},
-                "moderate_scam": {"precision": train_per_class[0][1], "recall": train_per_class[1][1], "f1": train_per_class[2][1]},
-                "high_scam": {"precision": train_per_class[0][2], "recall": train_per_class[1][2], "f1": train_per_class[2][2]}
+                "scam": {"precision": train_per_class[0][1], "recall": train_per_class[1][1], "f1": train_per_class[2][1]}
             }
         },
         "test": {
@@ -157,17 +151,15 @@ def train_xgboost(X_train, y_train, X_test, y_test, config):
             "f1_weighted": test_f1,
             "per_class": {
                 "legit": {"precision": test_per_class[0][0], "recall": test_per_class[1][0], "f1": test_per_class[2][0]},
-                "moderate_scam": {"precision": test_per_class[0][1], "recall": test_per_class[1][1], "f1": test_per_class[2][1]},
-                "high_scam": {"precision": test_per_class[0][2], "recall": test_per_class[1][2], "f1": test_per_class[2][2]}
+                "scam": {"precision": test_per_class[0][1], "recall": test_per_class[1][1], "f1": test_per_class[2][1]}
             }
         }
     }
     save_metrics(metrics, "xgboost", config)
     
-    model_path = get_output_filename(config["model"]["save_path"], "xgboost", config) + ".pkl"
+    model_path = get_output_filename(config["model"]["save_path"], "xgboost_model", config) + ".joblib"
     os.makedirs(config["model"]["save_path"], exist_ok=True)
-    with open(model_path, "wb") as f:
-        pickle.dump(model, f)
+    joblib.dump(model, model_path)
     logger.info(f"XGBoost model saved to {model_path}")
     return model
 
@@ -210,7 +202,7 @@ def train_bert(config):
         bert_test_data["labels"]
     )
     
-    model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=3)
+    model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
     training_args = TrainingArguments(
         output_dir=config["model"]["save_path"],
         num_train_epochs=config["model"]["hyperparams"].get("epochs", 3),
@@ -230,7 +222,7 @@ def train_bert(config):
         predictions = np.argmax(logits, axis=-1)
         accuracy = accuracy_score(labels, predictions)
         precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average="weighted")
-        per_class = precision_recall_fscore_support(labels, predictions, average=None, labels=[0, 1, 2])
+        per_class = precision_recall_fscore_support(labels, predictions, average=None, labels=[0, 1])
         return {
             "accuracy": accuracy,
             "precision": precision,
@@ -265,14 +257,13 @@ def train_bert(config):
             "f1_weighted": eval_results["eval_f1"],
             "per_class": {
                 "legit": {"precision": eval_results["per_class_precision"][0], "recall": eval_results["per_class_recall"][0], "f1": eval_results["per_class_f1"][0]},
-                "moderate_scam": {"precision": eval_results["per_class_precision"][1], "recall": eval_results["per_class_recall"][1], "f1": eval_results["per_class_f1"][1]},
-                "high_scam": {"precision": eval_results["per_class_precision"][2], "recall": eval_results["per_class_recall"][2], "f1": eval_results["per_class_f1"][2]}
+                "scam": {"precision": eval_results["per_class_precision"][1], "recall": eval_results["per_class_recall"][1], "f1": eval_results["per_class_f1"][1]}
             }
         }
     }
     save_metrics(metrics, "bert", config)
     
-    model_path = get_output_filename(config["model"]["save_path"], "bert", config)
+    model_path = get_output_filename(config["model"]["save_path"], "bert_model", config)
     os.makedirs(config["model"]["save_path"], exist_ok=True)
     model.save_pretrained(model_path)
     logger.info(f"BERT model saved to {model_path}")
@@ -327,6 +318,7 @@ def train_model(X, y, model_type="XGBoost"):
                 n_estimators=100,
                 learning_rate=0.1,
                 max_depth=5,
+                objective="binary:logistic",
                 random_state=42
             )
         elif model_type == "Logistic Regression":

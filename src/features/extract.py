@@ -48,7 +48,8 @@ def extract_tfidf_features(df, config, vectorizer=None):
     binary_features = df[["has_caps", "has_phone", "is_kiswahili_sheng"]].astype(int).values
     X_combined = np.hstack([X_tfidf, binary_features])
     
-    label_map = {"legit": 0, "moderate_scam": 1, "high_scam": 2}
+    # Updated label_map for binary classification
+    label_map = {"legit": 0, "scam": 1}
     y = df["label"].map(label_map).values
     if np.any(np.isnan(y)):
         logger.warning("NaN labels detected; dropping corresponding rows")
@@ -70,7 +71,8 @@ def extract_bert_features(df, config, tokenizer=None):
         max_length=config["features"]["bert_max_length"],
         return_tensors="pt"
     )
-    label_map = {"legit": 0, "moderate_scam": 1, "high_scam": 2}
+    # Updated label_map for binary classification
+    label_map = {"legit": 0, "scam": 1}
     y = torch.tensor(df["label"].map(label_map).values)
     if torch.any(y.isnan()):
         logger.warning("NaN labels detected; dropping corresponding rows")

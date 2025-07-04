@@ -81,18 +81,6 @@ def preprocess_text(text):
 
     return tokens, cleaned_text, has_caps, has_phone, is_kiswahili_sheng
 
-
-def map_labels(prelabel):
-    if pd.isna(prelabel):
-        return np.nan
-    prelabel = str(prelabel).strip()
-    label_map = {
-        "0: Legit (Low-risk)": "legit",
-        "1: Moderate-risk scam": "moderate_scam",
-        "2: High-risk scam": "high_scam"
-    }
-    return label_map.get(prelabel, np.nan)
-
 # ─────────────────────────────────────────────────────────────
 # ✅ PIPELINE
 # ─────────────────────────────────────────────────────────────
@@ -102,14 +90,13 @@ def run_preprocessing():
     df = pd.read_csv(input_path)
     if "message_content" not in df.columns:
         raise ValueError("'message_content' column is missing.")
+    if "label" not in df.columns:
+        raise ValueError("'label' column is missing.")
 
     logger.info("Applying preprocessing to all rows...")
     preprocessed_results = df["message_content"].apply(preprocess_text)
     results = list(zip(*preprocessed_results))
     df["tokens"], df["cleaned_text"], df["has_caps"], df["has_phone"], df["is_kiswahili_sheng"] = results
-
-    logger.info("Mapping labels...")
-    df["label"] = df["prelabel"].apply(map_labels)
 
     logger.info(f"Label distribution before dropping NaN:\n{df['label'].value_counts(dropna=False)}")
     initial_rows = len(df)
