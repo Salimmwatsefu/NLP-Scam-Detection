@@ -1,10 +1,28 @@
 # Methods used and explanations. It is personal and will be deleted afterwards
 
-## 1. Step-1 Data Labelling
+## 1. Step‑1 Data Labelling
 
-Used Label Studio for labelling ( correcting ) the prelabeled data.
-Includes a prelabel column which is either 0: Legit (Low-risk), 1:Moderate risk Scam, 2: High risk scam. The the label columns classifies them as either legit or scam.
-Used the prelabel.py and label.py scripts under the scripts folder.
+Used Label Studio for labelling (correcting) the prelabeled data. There is a `prelabel` column with values:
+
+* **0: Legit (Low-risk)**
+* **1: Moderate-risk Scam**
+* **2: High-risk Scam**
+
+The `label` column simplifies this into **`legit`** or **`scam`**.
+
+### Scripts Overview
+
+* **`prelabel.py`**: Automatically assigns `prelabel` values based on keyword rules found in the `message_content` column.
+
+  * **High-risk keywords** (e.g., `http`, `password`, `verify`, `urgent`, `activation fee`, `transfer to`) classify a message as **2: High-risk scam**.
+  * **Legit keywords** (e.g., `mpesa`, `rent`, `transaction id`, `safaricom`, `prayer`, `church`) classify a message as **0: Legit (Low-risk)**.
+  * **Moderate-risk keywords** (e.g., `win`, `bonus`, `claim`, `discount`, `voucher`, `eligible for`) classify a message as **1: Moderate-risk scam**.
+  * If no keywords are matched, the message defaults to **0 (legit)**.
+
+  The script outputs a `prelabeled_messages.csv` file.
+
+* **`label.py`**: Converts the numeric `prelabel` values (0/1/2) into binary labels (`legit` or `scam`) by mapping 1 and 2 to **scam**, and saves the final dataset as `scam_detection_labeled.csv`.
+
 
 ## 2. Text preprocessing
 
