@@ -161,6 +161,7 @@ pathspec==0.12.1
 pexpect==4.9.0
 pillow==11.1.0
 platformdirs==4.3.7
+plotly
 preshed==3.0.9
 prompt_toolkit==3.0.50
 proto-plus==1.26.1
